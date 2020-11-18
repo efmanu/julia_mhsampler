@@ -1,4 +1,4 @@
-#CPU and GPU implementation of Metropolis-Hastings algorithm using Julia
+# CPU and GPU implementation of Metropolis-Hastings algorithm using Julia
 
 This project aimed to sample randomly in normal distribution domain. The implementation just focuses GPU and CPU implementation. There is no further optimization is done in GPU.
 
