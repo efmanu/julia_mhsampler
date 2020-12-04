@@ -2,6 +2,7 @@ using Distributions
 using Plots, StatsPlots
 using CUDA
 using Random
+using BenchmarkTools
 
 Random.seed!(5236)
 
@@ -67,7 +68,7 @@ function sampling_kernel(cu_samples, cu_status, cu_accept)
     ratio = move_prob/curr_prob
     acceptance = min(move_prob/curr_prob,1.0)
     if cu_accept[idx] < acceptance
-        cu_status[idx] = true
+        cu_status[idx] = 1
     end
     return nothing
 end
@@ -76,17 +77,18 @@ end
 Samples and executes Metropolis-Hastings algorithm for `itr`
 itr number of samples with CUDA implemetation
 """
+#falses generates eq to fill(false,itr)
 function cu_gaussian_mcmc(itr,μ,σ) 
     samples = rand(Uniform(-5*σ+μ,5*σ+μ), itr) 
-    status = fill(false,itr)
+    status = falses(itr)
     accept = rand(Uniform(0.0,1.0), itr)
     cu_accept = CuArray(accept)
     cu_samples = CuArray(samples)
     cu_status = CuArray(status)
     @cuda threads=itr sampling_kernel(cu_samples, cu_status, cu_accept)
     out_status = Array(cu_status)
-    loc = findall(out_status)
-    return samples[loc]
+    # loc = findall(out_status)
+    return samples[out_status .== 1]
 end
 
 N = 1000
@@ -117,5 +119,13 @@ plot(p1, p2, layout = l)
 
 # histogram(distcu,bins=20, normed=true) 
 # plot!(lines, normal_curve)
+
+@btime gaussian_mcmc(N,μ,σ)
+@btime cu_gaussian_mcmc(N,μ,σ)
+
+#CPU = 64μs 11 allocations
+#GPU = 192μs 41 allocations
+#GPU w/o findall = 194.099 μs (44 allocations: 25.19 KiB)
+
 
 

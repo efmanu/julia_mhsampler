@@ -1,0 +1,53 @@
+GeForce 940M0 details
+
+Maximum number of threads per multiprocessor:  2048
+Maximum number of threads per block:           1024
+Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+
+Block = Group of threads
+Grid = Group of blocks
+
+Thread Indexing Cheatsheet
+
+1D grid of 1D blocks
+	threadId = blockIdx().x *blockDim().x + threadIdx().x
+
+1D grid of 2D blocks
+	threadId = blockIdx().x * blockDim().x * blockDim().y
+ 		+ threadIdx().y * blockDim().x + threadIdx().x
+
+1D grid of 3D blocks
+	threadId = blockIdx().x * blockDim().x * blockDim().y * blockDim().z + threadIdx().z * blockDim().y * blockDim().x
+		 + threadIdx().y * blockDim().x + threadIdx().x;
+
+2D grid of 1D blocks
+	blockId = blockIdx().y * gridDim().x + blockIdx().x;
+	threadId = blockId * blockDim().x + threadIdx().x;
+	
+2D grid of 2D blocks
+	blockId = blockIdx().x + blockIdx().y * gridDim().x;
+	threadId = blockId * (blockDim().x * blockDim().y)
+	 + (threadIdx().y * blockDim().x) + threadIdx().x;
+
+2D grid of 3D blocks
+	blockId = blockIdx().x + blockIdx().y * gridDim().x;
+	threadId = blockId * (blockDim().x * blockDim().y * blockDim().z) + (threadIdx().z * (blockDim().x * blockDim().y)) + (threadIdx().y * blockDim().x) + threadIdx().x;
+
+3D grid of 1D blocks
+	blockId = blockIdx().x + blockIdx().y * gridDim().x
+	+ gridDim().x * gridDim().y * blockIdx().z;
+	threadId = blockId * blockDim().x + threadIdx().x;
+
+3D grid of 2D blocks
+	blockId = blockIdx().x + blockIdx().y * gridDim().x
+	+ gridDim().x * gridDim().y * blockIdx().z;
+	threadId = blockId * (blockDim().x * blockDim().y)
+ 	+ (threadIdx().y * blockDim().x) + threadIdx().x;
+
+3D grid of 3D blocks
+	blockId = blockIdx().x + blockIdx().y * gridDim().x
+ 		+ gridDim().x * gridDim().y * blockIdx().z;
+	threadId = blockId * (blockDim().x * blockDim().y * blockDim().z)
+ 		+ (threadIdx().z * (blockDim().x * blockDim().y))
+ 		+ (threadIdx().y * blockDim().x) + threadIdx().x;
